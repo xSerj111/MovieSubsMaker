@@ -2,47 +2,49 @@ import stable_whisper
 import torch
 from pathlib import Path
 from rich.console import Console
+from transformers import pipeline  # <--- Nowy import! Użyjemy go do ominięcia błędu
 
 console = Console()
 
-def run(video_path: Path, model_name: str = "small", use_anime_model: bool = False, source_lang: str = None) -> Path:
-    """
-    Runs video transcription using stable-ts.
-    Returns the path to the generated SRT file.
-    """
-    # 1. Automatic hardware detection
+def run(video_path: Path, model_name: str = "small", source_lang: str = None, use_anime_model: bool = False) -> Path:
+    # 1. Detekcja sprzętu
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    console.print(f"[info]Compute device:[/info] [bold]{device.upper()}[/bold]")
+    console.print(f"Compute device: [highlight]{device.upper()}[/highlight]")
+    console.print("Loading model into memory...")
 
-    # 2. Model selection and loading
-    console.print("[info]Loading model into memory (it will be downloaded on the first run)...[/info]")
-    
+    # 2. Wybór i ładowanie modelu (Ręczny Bypass Błędu)
     if use_anime_model:
         actual_model = "litagin/anime-whisper"
-        console.print(f"[info]Loading domain model from HuggingFace:[/info] [highlight]{actual_model}[/highlight]")
-        # This specific function handles non-standard HuggingFace models
-        model = stable_whisper.load_hf_whisper(actual_model, device=device)
+        console.print(f"Loading domain model directly via Transformers pipeline: [highlight]{actual_model}[/highlight]")
+        
+        # OMIJAMY BŁĄD W STABLE-TS: Tworzymy rurociąg (pipeline) ręcznie,
+        # pomijając zepsute argumenty z 'use_flash_attention_2'.
+        pipe = pipeline(
+            "automatic-speech-recognition",
+            model=actual_model,
+            device=device,
+            chunk_length_s=30  # Zabezpiecza pamięć RAM przed przepełnieniem
+        )
+        
+        # Podajemy gotowy pipeline do stable-ts
+        model = stable_whisper.load_hf_whisper(actual_model, pipeline=pipe)
     else:
         actual_model = model_name
-        console.print(f"[info]Loading standard Whisper model:[/info] [highlight]{actual_model}[/highlight]")
-        # This handles standard OpenAI models (small, medium, turbo, etc.)
         model = stable_whisper.load_model(actual_model, device=device)
 
-    console.print(f"[warning]Starting audio transcription for '{video_path.name}'. This might take a while on a CPU![/warning]")
-
-    # 3. Actual transcription
-    result = model.transcribe(
-        str(video_path),
-        language=source_lang,
-        word_timestamps=True,
-        vad=True 
-    )
-
-    # 4. Save result to SRT file
-    output_srt_path = video_path.with_suffix(".srt")
+    # 3. Rozpoczęcie transkrypcji
+    console.print(f"[info]Starting transcription for: {video_path.name}[/info]")
     
-    result.to_srt_vtt(str(output_srt_path), word_level=False)
-
-    console.print(f"[success]Transcription successful! Saved as:[/success] {output_srt_path.name}")
+    transcribe_kwargs = {"vad": True}
+    if source_lang:
+        transcribe_kwargs["language"] = source_lang
+        console.print(f"[info]Forced source language: {source_lang}[/info]")
     
-    return output_srt_path
+    result = model.transcribe(str(video_path), **transcribe_kwargs)
+    
+    # 4. Zapis do pliku SRT
+    output_srt = video_path.with_suffix(".srt")
+    result.to_srt_vtt(str(output_srt))
+    
+    console.print(f"[success]Transcription finished! Saved as: {output_srt.name}[/success]")
+    return output_srt

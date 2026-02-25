@@ -29,7 +29,7 @@ Make sure you have `ffmpeg` installed on your system, as it's required for audio
 ```bash
 git clone https://github.com/xSerj111/MovieSubsMaker.git
 cd MovieSubsMaker
-python -m venv venv
+python3 -m venv venv
 ```
 
 ### 3. Activate the virtual environment
