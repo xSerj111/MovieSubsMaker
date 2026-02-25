@@ -6,7 +6,7 @@ from rich.console import Console
 from rich.theme import Theme
 
 # We import our transcriber and translator module
-from modules import transcriber, translator
+from modules import transcriber, translator, synchronizer
 
 # Configure colors for console logs
 custom_theme = Theme({
@@ -98,10 +98,18 @@ def handle_sync_mode(args):
     console.print(f"Video: [highlight]{args.video}[/highlight]")
     console.print(f"Subtitles (source): [highlight]{args.srt}[/highlight]")
     
-    console.print("\n[info]Starting timing synchronization (ffsubsync)...[/info]")
-    # synchronizer.run(...)
+    console.print("\n[info]--- TIMING SYNCHRONIZATION ---[/info]")
     
-    console.print("\n[success]Synchronization completed! Saved adjusted SRT file.[/success]")
+    try:
+        final_srt_path = synchronizer.run(
+            video_path=args.video,
+            srt_path=args.srt,
+            output_path=args.output
+        )
+        console.print(f"\n[success]All done! Synced file is ready: {final_srt_path.name}[/success]")
+    except Exception as e:
+        console.print("\n[error]Synchronization process encountered an error and stopped.[/error]")
+        sys.exit(1)
 
 
 def main():

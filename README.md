@@ -5,6 +5,7 @@ Local, open-source CLI tool for generating high-quality subtitles using AI. It h
 ## ✨ Features
 * **Full Pipeline (`full`)**: Transcribes video audio and translates it to the target language in one go.
 * **Smart Translation (`translate`)**: Translates existing `.srt` files locally without hitting external APIs.
+* **Timing Synchronization (`sync`)**: Automatically aligns out-of-sync subtitles to the video's audio track using `ffsubsync`.
 * **Anime Support**: Built-in support for the `litagin/anime-whisper` domain model for superior Japanese transcription.
 * **Auto Hardware Detection**: Seamlessly switches between CPU, Apple Silicon (MPS), and GPU (CUDA) for maximum performance.
 * **Cache Management (`clean`)**: Easily free up disk space by removing heavy AI models with a single command.
@@ -13,6 +14,7 @@ Local, open-source CLI tool for generating high-quality subtitles using AI. It h
 * **Python** (Core CLI logic + `argparse`)
 * **stable-ts** (Audio transcription & precise timestamping via Whisper)
 * **Transformers & Torch** (Translation via NLLB-200)
+* **ffsubsync** (Audio-based subtitle synchronization)
 * **Rich** (Beautiful terminal outputs)
 
 ## 🚀 Installation
@@ -68,7 +70,12 @@ python main.py full episode.mkv --source-lang ja --target-lang en --anime
 python main.py translate subs.srt --source-lang ja --target-lang pl
 ```
 
-**4. Clean up downloaded AI models from disk:**
+**4. Synchronize out-of-sync subtitles to a video:**
+```bash
+python main.py sync movie.mp4 out_of_sync_subs.srt
+```
+
+**5. Clean up downloaded AI models from disk:**
 ```bash
 python main.py clean
 ```
@@ -77,5 +84,5 @@ python main.py clean
 - [x] Audio Transcription (Stable-ts / Whisper)
 - [x] Subtitle Translation (NLLB-200)
 - [x] Cache Management
-- [ ] Subtitle Synchronization (`ffsubsync`)
+- [x] Subtitle Synchronization (`ffsubsync`)
 - [ ] Context-aware subtitle translation (Sentence merging)
