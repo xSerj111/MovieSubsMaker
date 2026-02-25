@@ -1,0 +1,13 @@
+# Środowisko wirtualne i cache
+venv/
+__pycache__/
+.cache/
+
+# Pliki wideo i napisy testowe
+*.mp4
+*.mkv
+*.avi
+*.srt
+
+# Twoje prywatne pliki
+info.odt

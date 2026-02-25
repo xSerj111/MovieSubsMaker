@@ -1,0 +1,6 @@
+torch
+transformers
+stable-ts
+ffsubsync
+pysrt
+rich
