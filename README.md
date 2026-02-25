@@ -27,18 +27,22 @@ Make sure you have `ffmpeg` installed on your system, as it's required for audio
 
 ### 2. Clone the repo & set up the environment
 ```bash
-git clone [https://github.com/xSerj111/MovieSubsMaker.git](https://github.com/xSerj111/MovieSubsMaker.git)
+git clone https://github.com/xSerj111/MovieSubsMaker.git
 cd MovieSubsMaker
 python -m venv venv
 ```
 
 ### 3. Activate the virtual environment
-* **Linux / macOS:** ```bash
+* **Linux / macOS:** 
+```bash
 source venv/bin/activate
 ```
-* **Windows (Command Prompt):** ```cmd
+
+* **Windows (Command Prompt):** 
+```cmd
 venv\Scripts\activate
 ```
+
 > **Note for Windows PowerShell users:** If you get an "Execution of scripts is disabled" error, run Windows PowerShell as Administrator and execute: `Set-ExecutionPolicy Unrestricted -Force`, then try activating again.
 
 ### 4. Install Python packages
@@ -48,7 +52,7 @@ pip install -r requirements.txt
 
 > ⚠️ **IMPORTANT: NVIDIA GPU Users (Windows/Linux)** > To unleash maximum performance and hardware acceleration, install the CUDA version of PyTorch instead of the default one:
 > ```bash
-> pip install torch torchvision torchaudio --index-url [https://download.pytorch.org/whl/cu121](https://download.pytorch.org/whl/cu121)
+> pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 > ```
 
 ---
